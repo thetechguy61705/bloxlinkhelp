@@ -75,7 +75,6 @@ bot.on("ready", async () => {
 
 bot.on("message", async (message) => {
 	if (message.author.bot) return;
-	if (message.channel.name !== "bot-commands" && message.guild.id === "372036754078826496") return;
 	if (message.channel.type === "dm") return;
 	let prefix = botconfig.prefix;
 	let messageArray = message.content.split(" ");
