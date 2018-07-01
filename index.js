@@ -1,6 +1,7 @@
 const botconfig = require("./botconfig.js");
 const Discord = require("discord.js");
 const fs = require("fs");
+const isStaff = require("app/staff");
 const bot = new Discord.Client({ disableEveryone: true, fetchAllMembers: true });
 bot.commands = { enabledCommands: new Discord.Collection(), disabledCommands: [] };
 bot.allcommands = new Discord.Collection();
@@ -75,13 +76,16 @@ bot.on("ready", async () => {
 
 bot.on("message", async (message) => {
 	if (message.author.bot) return;
-	if (message.channel.type === "dm") return;
-	let prefix = botconfig.prefix;
-	let messageArray = message.content.split(" ");
-	let cmd = messageArray[0].toLowerCase();
-	let args = messageArray.slice(1);
-	if (!message.content.startsWith(botconfig.prefix)) return;
-	let commandfile = bot.commands.enabledCommands.get(cmd.slice(prefix.length));
-	return commandfile.run(bot, message, args);
+	var member = bot.guilds.get("372036754078826496").members.get(message.author.id);
+	if (member && isStaff(member)) {
+		if (message.channel.type === "dm") return;
+		let prefix = botconfig.prefix;
+		let messageArray = message.content.split(" ");
+		let cmd = messageArray[0].toLowerCase();
+		let args = messageArray.slice(1);
+		if (!message.content.startsWith(botconfig.prefix)) return;
+		let commandfile = bot.commands.enabledCommands.get(cmd.slice(prefix.length));
+		return commandfile.run(bot, message, args);
+	} else console.log("oof");
 });
 bot.login(botconfig.token);
