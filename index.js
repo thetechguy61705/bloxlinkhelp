@@ -2,11 +2,8 @@ const botconfig = require("./botconfig.js");
 const Discord = require("discord.js");
 const fs = require("fs");
 const bot = new Discord.Client({ disableEveryone: true, fetchAllMembers: true });
-bot.counter = false;
 bot.commands = { enabledCommands: new Discord.Collection(), disabledCommands: [] };
 bot.allcommands = new Discord.Collection();
-bot.rateLimits = { poll: [], report: [], afk: [] };
-bot.databases = { disabled: [], prefixes: [] };
 bot.loaders = { enabledLoaders: [], disabledLoaders: [] };
 
 var loadFile = fs.readdirSync(__dirname + "/load");
@@ -63,46 +60,15 @@ bot.on("ready", async () => {
 	}
 });
 
-bot.on("message", (message) => {
-	if (message.channel.type !== "dm" && !message.author.bot) {
-		var cmd = message.content.split(" ")[0].toLowerCase();
-		if (cmd != null) {
-			var args = message.content.split(" ").slice(1),
-				content = args.join(" "),
-				prefix = bot.databases.prefixes.find((value) => value.guild === message.guild.id);
-			prefix = (prefix != null) ? prefix.prefix : botconfig.prefix;
-			cmd = cmd.slice(prefix.length);
-			var mentionMatch = message.content.match(/^<@!?419881218784493588>/);
-			// Checks if content starts with bot mention
-			var permissionLevel = bot.getPermissionLevel(message.author);
-			if (message.content.startsWith(prefix)) {
-				var commandFile = bot.commands.enabledCommands.find((command) => command.help.name === cmd || (command.help.aliases || []).includes(cmd));
-				if (commandFile != null) {
-					const disabled = bot.databases.disabled.find((value) => value.guild === message.guild.id);
-					var disableCheck = (disabled == null) ? false : true;
-					if (disableCheck) disableCheck = (disabled.commands.includes(cmd)) ? true : false;
-					if (!disableCheck) {
-						commandFile.run(bot, message, args, prefix, content, permissionLevel);
-					} else message.reply("This command is disabled by an admin in this server!");
-				}
-			} else if (mentionMatch != null) {
-				message.content = message.content.replace(mentionMatch[0], `${prefix}`);
-				var messageArray = message.content.split(" ");
-				args = messageArray.slice(1);
-				content = args.join(" ");
-				prefix = mentionMatch[0];
-				cmd = cmd.slice(prefix.length);
-				commandFile = bot.commands.enabledCommands.find((command) => command.help.name === cmd || (command.help.aliases || []).includes(cmd));
-				if (commandFile != null) {
-					const disabled = bot.databases.disabled.find((value) => value.guild === message.guild.id);
-					let disableCheck = (disabled == null) ? false : true;
-					if (disableCheck) disableCheck = (disabled.commands.includes(cmd)) ? true : false;
-					if (!disableCheck) {
-						commandFile.run(bot, message, args, prefix, content, permissionLevel);
-					} else message.reply("This command is disabled by an admin in this server!");
-				}
-			}
-		}
-	}
+bot.on("message", async (message) => {
+	if (message.author.bot) return;
+	if (message.channel.type === "dm") return;
+	let prefix = botconfig.prefix;
+	let messageArray = message.content.split(" ");
+	let cmd = messageArray[0].toLowerCase();
+	let args = messageArray.slice(1);
+	if (!message.content.startsWith(botconfig.prefix)) return;
+	let commandfile = bot.commands.get(cmd.slice(prefix.length));
+	return commandfile.run(bot, message, args);
 });
 bot.login(botconfig.token);

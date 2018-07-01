@@ -1,5 +1,5 @@
 module.exports =
 {
-  token: process.env.bottoken,
-  prefix: "!!"
+	token: process.env.bottoken,
+	prefix: "!!"
 };

@@ -1,15 +1,27 @@
 {
-  "name": "pingpongbot",
-  "version": "1.0.0",
-  "description": "a ping pong bot",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
-  },
-  "author": "ethanlaj#8805",
-  "license": "ISC",
-  "dependencies": {
-    "discord.js": "^11.3.0"
-  }
+	"name": "bloxlink-helper",
+	"version": "1.0.0",
+	"description": "a bloxlink staff helping bot",
+	"main": "index.js",
+	"scripts": {
+		"test": "eslint . && eslint test/. --env mocha && mocha",
+		"start": "node index.js",
+		"fix": "eslint . --fix && eslint test/. --env mocha --fix"
+	},
+	"author": "ethanlaj",
+	"license": "ISC",
+	"dependencies": {
+		"all": "0.0.0",
+		"babel-eslint": "^8.2.3",
+		"discord.js": "^11.3.0",
+		"eslint": "^4.19.1",
+		"eslint-plugin-promise": "^3.8.0",
+		"mocha": "^5.2.0",
+		"node-gyp": "^3.7.0",
+		"request-promise-native": "^1.0.5"
+	},
+	"devDependencies": {
+		"eslint-plugin-json": "^1.2.0",
+		"eslint-plugin-no-for-each": "github:ethanlaj/eslint-plugin-no-for-each"
+	}
 }
