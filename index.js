@@ -5,6 +5,8 @@ const bot = new Discord.Client({ disableEveryone: true, fetchAllMembers: true })
 bot.commands = { enabledCommands: new Discord.Collection(), disabledCommands: [] };
 bot.allcommands = new Discord.Collection();
 bot.loaders = { enabledLoaders: [], disabledLoaders: [] };
+bot.responses = [];
+
 
 var loadFile = fs.readdirSync(__dirname + "/load");
 
@@ -15,6 +17,17 @@ for (let file of loadFile) {
 	} catch (err) {
 		bot.loaders.disabledLoaders.push(file);
 		console.log(`\nThe ${file} load module failed to load:`);
+		console.log(err);
+	}
+}
+
+var loadResponses = fs.readdirSync(__dirname + "/responses");
+for (let response of loadResponses) {
+	try {
+		let responseFile = require("./responses/" + response);
+		bot.responses.push(responseFile);
+	} catch (err) {
+		console.log(`\nThe ${response} response module failed to load:`);
 		console.log(err);
 	}
 }
@@ -62,13 +75,14 @@ bot.on("ready", async () => {
 
 bot.on("message", async (message) => {
 	if (message.author.bot) return;
+	if (message.channel.name !== "bot-commands" && message.guild.id === "372036754078826496") return;
 	if (message.channel.type === "dm") return;
 	let prefix = botconfig.prefix;
 	let messageArray = message.content.split(" ");
 	let cmd = messageArray[0].toLowerCase();
 	let args = messageArray.slice(1);
 	if (!message.content.startsWith(botconfig.prefix)) return;
-	let commandfile = bot.commands.get(cmd.slice(prefix.length));
+	let commandfile = bot.commands.enabledCommands.get(cmd.slice(prefix.length));
 	return commandfile.run(bot, message, args);
 });
 bot.login(botconfig.token);
